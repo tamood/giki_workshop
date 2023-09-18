@@ -62,7 +62,7 @@ class SevenSegmentMulti(n: Int) extends RawModule {
   val io = IO(new BCD2SevenSegmentMultiBundle(n))
   val sel = IO(Input(UInt(n.W)))
 
-  val bcds = io.bcd.asTypeOf(Vec(n, UInt(n.W)))
+  val bcds = io.bcd.asTypeOf(Vec(n, UInt(4.W)))
 
   val ledsSeq = 0 until n map {i=>
     val display = Module(new SevenSegmentBasic)
