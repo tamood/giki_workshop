@@ -34,7 +34,7 @@ class NexysA7FPGAShell extends RawModule {
     bumps(0) := sec_cnt.inc()
 
     //25Hz counter
-    val cnt_25 = Counter(freq/25)
+    val cnt_25 = Counter(freq/(25*8))
     driver.io.sync := cnt_25.inc()
   }
 }
