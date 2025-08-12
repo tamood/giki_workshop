@@ -1,15 +1,22 @@
+ThisBuild / scalaVersion := "2.13.16"
 
-scalaVersion := "2.13.10"
+val chiselVersion = "7.0.0-RC1"
 
-scalacOptions ++= Seq(
-  "-deprecation",
-  "-feature",
-  "-unchecked",
-  "-Xfatal-warnings",
-  "-language:reflectiveCalls",
-)
-
-val chiselVersion = "3.5.6"
-addCompilerPlugin("edu.berkeley.cs" %% "chisel3-plugin" % chiselVersion cross CrossVersion.full)
-libraryDependencies += "edu.berkeley.cs" %% "chisel3" % chiselVersion
-libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.5.6"
+lazy val root = (project in file("."))
+  .settings(
+    name := "lab1",
+    libraryDependencies ++= Seq(
+      "org.chipsalliance" %% "chisel" % chiselVersion,
+      "org.scalatest" %% "scalatest" % "3.2.19" % "test"
+    ),
+    scalacOptions ++= Seq(
+      "-language:reflectiveCalls",
+      "-deprecation",
+      "-feature",
+      "-Xcheckinit",
+      "-Ymacro-annotations"
+    ),
+    addCompilerPlugin(
+      "org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full
+    )
+  )

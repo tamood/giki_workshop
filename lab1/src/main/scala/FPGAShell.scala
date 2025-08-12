@@ -2,6 +2,7 @@ import sevenSegmentDriver.NexysSevenSegmentDriver
 
 import chisel3._
 import chisel3.util._
+import _root_.circt.stage.ChiselStage
 class NexysA7FPGAShell extends RawModule {
   val CLK100MHZ = IO(Input(Clock()))
   val CPU_RESETN = IO(Input(Bool()))
@@ -17,28 +18,47 @@ class NexysA7FPGAShell extends RawModule {
 
   val freq = 100 * 1000000
 
-  withClockAndReset(CLK100MHZ, (~CPU_RESETN).asBool){
+  withClockAndReset(CLK100MHZ, (~CPU_RESETN).asBool) {
     val driver = Module(new NexysSevenSegmentDriver)
     AN := driver.io.displayIO.com
-    Seq(CA, CB, CC, CD, CE, CF, CG) zip driver.io.displayIO.leds.asUInt.asBools foreach {case (o, i)=> o := i}
+    Seq(
+      CA,
+      CB,
+      CC,
+      CD,
+      CE,
+      CF,
+      CG
+    ) zip driver.io.displayIO.leds.asUInt.asBools foreach { case (o, i) =>
+      o := i
+    }
 
-    //BCD counters
+    // BCD counters
     val bumps = Seq.fill(8)(Wire(Bool()))
     val bcd_counters = bumps map { Counter(_, 10) }
-    1 to 7 foreach {i=> bumps(i) := bcd_counters(i - 1)._2}
-    driver.io.displayIO.bcd := VecInit(bcd_counters map {case (value, wrap) => value}).asUInt
+    1 to 7 foreach { i => bumps(i) := bcd_counters(i - 1)._2 }
+    driver.io.displayIO.bcd := VecInit(bcd_counters map { case (value, wrap) =>
+      value
+    }).asUInt
     bumps(0) := true.B
 
-    //Second counter
+    // Second counter
     val sec_cnt = Counter(freq)
     bumps(0) := sec_cnt.inc()
 
-    //25Hz counter
-    val cnt_25 = Counter(freq/(25*8))
+    // 25Hz counter
+    val cnt_25 = Counter(freq / (25 * 8))
     driver.io.sync := cnt_25.inc()
   }
 }
 
 object FPGAMaker extends App {
-  emitVerilog(new NexysA7FPGAShell, Array("--target-dir", "generated"))
+  ChiselStage.emitSystemVerilogFile(
+    new NexysA7FPGAShell,
+    firtoolOpts = Array(
+      "-disable-all-randomization",
+      "-strip-debug-info",
+      "-default-layer-specialization=enable"
+    )
+  )
 }

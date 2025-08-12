@@ -2,29 +2,78 @@ package sevenSegmentDriver
 
 import scala.language.postfixOps
 
-object Digits{
+object Digits {
   private val zero =
     """
       .   _
       .  | |
       .  |_|
-      """
+    """
 
   private val one =
     """
       .
       .    |
       .    |
-      """
+    """
 
   private val two =
     """
       .   _
       .   _|
       .  |_
-      """
+    """
 
-  private val digits = Seq(zero, one, two)
+  private val three =
+    """
+      .   _
+      .   _|
+      .   _|
+    """
+
+  private val four =
+    """
+      . 
+      .  |_|
+      .    |
+    """
+
+  private val five =
+    """
+      .   _
+      .  |_
+      .   _|
+    """
+
+  private val six =
+    """
+      .   _
+      .  |_
+      .  |_|
+    """
+
+  private val seven =
+    """
+      .   _
+      .    |
+      .    |
+    """
+
+  private val eight =
+    """
+      .   _
+      .  |_|
+      .  |_|
+    """
+
+  private val nine =
+    """
+      .   _
+      .  |_|
+      .   _|
+    """
+
+  private val digits = Seq(zero, one, two, three, four, five, six, seven, eight, nine)
 
   def apply(num: Int) = digits(num)
 }
@@ -35,8 +84,7 @@ case object DecLeft extends DecorType
 case object DecRight extends DecorType
 case object DecMid extends DecorType
 
-
-object Decor{
+object Decor {
   private val left =
     """
       .   _
@@ -58,12 +106,14 @@ object Decor{
       .   _|
       """
 
-  private val decors = {Seq(DecLeft, DecMid, DecRight) zip Seq(left, mid, right)} toMap
+  private val decors = {
+    Seq(DecLeft, DecMid, DecRight) zip Seq(left, mid, right)
+  } toMap
 
   def apply(dtype: DecorType) = decors(dtype)
 }
 
-class SevenSegmentDigit(pattern: String){
+class SevenSegmentDigit(pattern: String) {
   def this(num: Int) = {
     this(Digits(num))
   }
@@ -74,12 +124,12 @@ class SevenSegmentDigit(pattern: String){
         row.toCharArray
       }
     }
-    //Indices of a-f in 3x3 character grid
+    // Indices of a-f in 3x3 character grid
     val indices = Seq((0, 1), (1, 2), (2, 2), (2, 1), (2, 0), (1, 0), (1, 1))
     indices map { case (r, c) => "|_".contains(table(r)(c + 2)) }
   }
 
-  private val pSeq_inv = pSeq map {i=> !i}
+  private val pSeq_inv = pSeq map { i => !i }
 
   def getCommonCathodePattern() = pSeq
   def getCommonAnodePattern() = pSeq_inv
